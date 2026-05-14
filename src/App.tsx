@@ -132,14 +132,21 @@ export default function App() {
         window.URL.revokeObjectURL(url);
       };
 
-      if (isSplit && numbers.length > splitSize) {
+      if (isSplit) {
         let currentFileIdx = startFileNumber;
-        for (let i = 0; i < numbers.length; i += splitSize) {
-          const chunk = numbers.slice(i, i + splitSize);
-          // Only include special contacts in the first chunk/file
-          const content = generateVcf(chunk, i, i === 0);
-          downloadFile(content, `${fileName}_part_${currentFileIdx}.vcf`);
-          currentFileIdx++;
+        
+        if (numbers.length > 0) {
+          for (let i = 0; i < numbers.length; i += splitSize) {
+            const chunk = numbers.slice(i, i + splitSize);
+            // Only include special contacts in the first chunk/file
+            const content = generateVcf(chunk, i, i === 0);
+            downloadFile(content, `${fileName} ${currentFileIdx}.vcf`);
+            currentFileIdx++;
+          }
+        } else if (activeSpecialNumbers.length > 0) {
+          // If only special groups are present
+          const content = generateVcf([], 0, true);
+          downloadFile(content, `${fileName} ${currentFileIdx}.vcf`);
         }
       } else {
         const content = generateVcf(numbers, 0, true);
@@ -522,7 +529,7 @@ export default function App() {
                             >
                               <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1">
-                                  <label className="text-[9px] font-bold text-zinc-500 uppercase">Kontak/File</label>
+                                  <label className="text-[9px] font-bold text-zinc-500 uppercase">Jumlah Kontak per File</label>
                                   <input
                                     type="number"
                                     value={splitSize}
@@ -531,7 +538,7 @@ export default function App() {
                                   />
                                 </div>
                                 <div className="space-y-1">
-                                  <label className="text-[9px] font-bold text-zinc-500 uppercase">Input Angka File</label>
+                                  <label className="text-[9px] font-bold text-zinc-500 uppercase">Mulai Penomoran File</label>
                                   <input
                                     type="number"
                                     value={startFileNumber}
